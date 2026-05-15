@@ -1,3 +1,4 @@
+from transcribe import transcribe_audio
 from trim import trim_audio
 import streamlit as st
 
@@ -10,7 +11,7 @@ st.set_page_config(
 )
 
 st.title("🎧 YouTube 採聲器")
-st.caption("第 4 步：下載並依秒數裁切音訊（尚未轉文字）")
+st.caption("第 5 步：下載、裁切並轉成文字")
 
 st.write("大家好")
 st.write("這是我的 YouTube 採聲器專案")
@@ -45,5 +46,9 @@ if st.button("開始下載音訊"):
             st.success("處理完成！")
             st.write(f"檔案位置：`{audio_path}`")
             st.audio(audio_path, format="audio/mp3")
+            with st.spinner("轉換文字中（第一次會較久）…"):
+                text = transcribe_audio(audio_path, model_name="base")
+            st.subheader("逐字稿")
+            st.text_area("轉錄結果", value=text, height=300)
         except Exception as e:
             st.error(f"下載失敗：{e}")
