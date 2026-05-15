@@ -1,4 +1,7 @@
+from trim import trim_audio
 import streamlit as st
+
+from download import download_audio
 
 st.set_page_config(
     page_title="YouTube 採聲器",
@@ -7,7 +10,7 @@ st.set_page_config(
 )
 
 st.title("🎧 YouTube 採聲器")
-st.caption("第 1 步：介面測試（尚未下載音訊）")
+st.caption("第 4 步：下載並依秒數裁切音訊（尚未轉文字）")
 
 st.write("大家好")
 st.write("這是我的 YouTube 採聲器專案")
@@ -20,19 +23,27 @@ with col1:
     start_sec = st.number_input("從第幾秒開始（0 = 從頭）", min_value=0, value=0, step=1)
 with col2:
     duration_sec = st.number_input(
-        "要取幾秒（0 = 不限制，之後步驟才會真的用到）",
+        "要取幾秒（0 = 不限制，取到結尾）",
         min_value=0,
         value=0,
         step=1,
     )
 
-if st.button("開始處理（第 1 步僅顯示設定）"):
+if st.button("開始下載音訊"):
     if not url.strip():
         st.error("請先貼上 YouTube 網址")
     else:
-        st.success("介面正常！")
-        st.json({
-            "網址": url.strip(),
-            "開始秒數": start_sec,
-            "長度秒數": "不限制" if duration_sec == 0 else duration_sec,
-        })
+        try:
+            with st.spinner("下載中，請稍候…"):
+                audio_path = download_audio(url.strip())
+            with st.spinner("裁切中…"):
+                audio_path = trim_audio(
+                    audio_path,
+                    start_sec=int(start_sec),
+                    duration_sec=int(duration_sec),
+                )
+            st.success("處理完成！")
+            st.write(f"檔案位置：`{audio_path}`")
+            st.audio(audio_path, format="audio/mp3")
+        except Exception as e:
+            st.error(f"下載失敗：{e}")
