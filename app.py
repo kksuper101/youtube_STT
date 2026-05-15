@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import streamlit as st
@@ -25,6 +26,8 @@ st.write("單純測試用")
 tab_yt, tab_upload = st.tabs(["YouTube 下載", "上傳音檔"])
 
 with tab_yt:
+    if os.environ.get("STREAMLIT_RUNTIME_ENV") == "cloud":
+        st.info("youtube採聲器雲端無法使用，請至本機測試")
     url = st.text_input(
         "請貼上 YouTube 網址",
         placeholder="https://www.youtube.com/watch?v=...",
